@@ -1,0 +1,56 @@
+---
+title: "MapViz"
+author: "Omar Ali Fdal"
+date: "27 October 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(leaflet)
+library(lubridate)
+setwd("~/Projects/ml/datasciencewithR/assignments/dataprod/leaflet/")
+```
+
+
+```{r, echo=FALSE}
+# rastertiles/voyager
+tileUrl <- "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"
+tt <- read.csv("triptemplates_20171027.csv")
+
+tt$activeColor <- "blue"
+tt$activeColor[tt$active=="false"] <- "gray"
+```
+
+## The Data
+
+### All trip templates
+
+```{r allTpl}
+ttmap <- tt %>%
+  leaflet() %>%
+  setView(2.421320, 46.877146, zoom=5) %>%
+  addTiles(urlTemplate=tileUrl) %>%
+  addMarkers(lat=~departureLat,
+             lng=~departureLng, 
+             clusterOptions = markerClusterOptions())
+ttmap
+```
+
+
+### Active vs. Inactive
+```{r activeTpl}
+ttmap <- tt %>%
+  leaflet() %>%
+  setView(7.269157, 43.698512, zoom=14) %>%
+  addTiles(urlTemplate=tileUrl) %>%
+  addCircleMarkers(lat=~departureLat,
+             lng=~departureLng,
+             weight=1,
+             color=tt$activeColor) %>%
+             #clusterOptions = markerClusterOptions()) 
+  addLegend(position="bottomleft",
+            labels=c("Active", "Inactive"),
+            colors=c("blue", "gray"))
+ttmap
+```
